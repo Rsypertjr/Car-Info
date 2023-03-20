@@ -366,7 +366,7 @@
                 searchString = '';           
                 let count = 0;
                 let prior3 = "";
-                for(let i = 1950;i < new Date().getFullYear();i++){
+                for(let i = 1950;i <= new Date().getFullYear();i++){
                     years[count] = i;
                     count++;
                 }
