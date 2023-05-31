@@ -7,10 +7,21 @@
         
       
         <style>
-      
+        #outer {
+            width:100%;
+            padding:3%;
+        }
+
+        #site_instructions{
+            position:relative;
+            width: 80%;
+            margin-left:10%;
+        }
         #car_info {
             position:relative;
-            width: 100%;
+            width: 90%;
+            margin-left:10%;
+            float:left;
         }
        
         #body{
@@ -19,14 +30,43 @@
         }
         #jumbo{
             position:relative;
+            margin-right:5%;
+            margin-left:2px;
+            border: 1px solid black;
+            width:55%;
+            float:right;
             height:auto;
             padding:2em 0;
         }
 
+        #sideBar{
+            position:relative;
+            margin-left:5%;
+
+            border: 1px solid lightBlue;
+            background-color:lightBlue;
+
+            width:30%;
+            float:left;
+            height:auto;
+            padding:2em 0;
+        }
+
+
+        #searchInfo{
+            position:relative;
+            width:90%;
+            margin-left:10%;
+            float:left;
+            height:20%;
+            padding:2em 0;
+        }
+
         #search_results {
-            height:30em;
+            height:20em;
             width:100%;
             overflow-y:scroll;
+            overflow-x:scroll;
         }
 
         #showCar{
@@ -36,11 +76,9 @@
           position:relative;
           background-image:linear-gradient(white,black);
           font-size:1.0em;
-          width:50%;
           height:auto;
-          left:25%;
-          padding:1em;
           text-align:center;
+          padding:0.5em;
             
         }
         .gotosite{
@@ -55,10 +93,7 @@
             font-weight: bold;
             line-height: 25px;
         }
-        #search_results {
-            position:relative;
-            height:50%;
-        }
+       
         #car_info {
             position:relative;   
             position:relative;
@@ -72,17 +107,18 @@
         }
         
         #info_carousel {
-            font-size:1.5em;
+           
         }
 
         #search_string {
-            background-color:black;
+            background-color:lightGrey;
             border-color:white;
             border-style:solid;
             border-width:1px;
             height:2em;
             font-size:1em;
             padding:3px;
+            color:black;
         }
 
         #previous_searches {
@@ -91,9 +127,11 @@
         }
 
         #iconDisplay > .carousel-inner {
+            position:relative;
             background-color:white;
             width:60%;
-            margin-left:20%;
+            height:5em;
+            padding:1em;
         }
 
         #site_selected > h4 {
@@ -105,7 +143,11 @@
 
         #siteInfo{
             display:none;
+            position:relative;
             z-index:20;
+            width:90%;
+            margin-left:5%;
+            height:30%;
         }
 
        
@@ -173,7 +215,7 @@
                     return anchor;           
                 };
                 
-                const makeResultsParts = (result) => {showCar
+                const makeResultsParts = (result) => {
                     const anchor = document.createElement('a');
                     anchor.href = result['url'];
                     anchor.target = '_blank';
@@ -279,6 +321,7 @@
                           count++;
                     }
                     $('#showCar').append(carousel_inner);
+                    $('#iconDisplay').hide();
                     resultsDiv.appendChild(table);
                     customResults.append(results_accordian);
                     storeImageLinks(imgArr2);
@@ -319,13 +362,19 @@
                         if(no_carimages > 200)
                             imgArr2 = {"carimages":[]};
    
-                        for(image of imgArr2.carimages){
-                            let test = imgArr.carimages.filter(function(img){
-                                return img.link == image.link;
-                            });
-                            console.log(test);
-                            if( test.length == 0)
-                                imgArr.carimages.push(image);
+                        if(imgArr.carimages.length > 0){
+                            for(image of imgArr2.carimages){
+                                let test = imgArr.carimages.filter(function(img){
+                                    return img.link == image.link;
+                                });
+                                console.log(test);
+                                if( test.length == 0)
+                                    imgArr.carimages.push(image);
+                            }
+                        }
+                        else {
+                            imgArr2 = {"carimages":[]};
+                            imgArr.carimages.push(image);
                         }
                         console.log("new length:",imgArr.carimages.length);
                         var myText = JSON.stringify(imgArr);
@@ -398,7 +447,7 @@
                             let droptext = $(e.target).text();
                             $('#site_selected').fadeIn().find('h4').text("Site Selected: " + droptext);
 
-                            
+                            $('#iconDisplay').hide();                            
                             $("#info").text(''); 
                             $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                             carsite_url = e.target.value;   
@@ -420,7 +469,6 @@
                                 searchString = prior1 + car.make.name + " ";
                                 $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                 $("#search_string").text(searchString); 
-                                
                                 // $('#model_dropdown > ul').html('');
                             
                                 for(model of car.make.models){
@@ -482,7 +530,7 @@
 
                 if(carsite_url.includes('gurus')){
                                 info = "CarGurus Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;width:50%;height:40%;margin-left:25%;" >
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;" >
                                                         <img src="images/cargurus.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.5)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">CarGurus site description</h5>
@@ -497,7 +545,7 @@
                             }
                             else if(carsite_url.includes("carmax")){
                                 info = "CarMax Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;width:50%;height:40%;margin-left:25%;">
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
                                                         <img src="images/carmax.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">CarMax site description</h5>
@@ -512,7 +560,7 @@
                             }
                             else if(carsite_url.includes("usnews")){
                                 info = "US News & World Reports Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;width:50%;height:40%;margin-left:25%;">
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
                                                         <img src="images/us news & world reports.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">US News & World Reports site description</h5>
@@ -526,7 +574,7 @@
                             }
                             else if(carsite_url.includes("carvana")){
                                 info = "Carvana Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;width:50%;height:40%;margin-left:25%;">
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
                                                         <img src="images/carvana.png" class="card-img-top" alt="Carvana" style="transform:scale(0.6)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">Carvana site description</h5>
@@ -541,7 +589,7 @@
                             }
                             else if(carsite_url.includes("truecar")){
                                 info = "TrueCar, Inc. Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;width:50%;height:40%;margin-left:25%;">
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
                                                         <img src="images/truecar.png" class="card-img-top" alt="TrueCar, Inc." style="transform:scale(0.5)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">TrueCar, Inc. site description</h5>
@@ -555,7 +603,7 @@
                             }
                             else if(carsite_url.includes("autotrader")){
                                 info = "Autotrader Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;width:50%;height:40%;margin-left:25%;">
+                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;">
                                                         <img src="images/autotrader.png" class="card-img-top" alt="Autotrader" style="transform:scale(0.6)">
                                                         <div class="card-body">
                                                             <h5 class="card-title" style="color:blue">Autotrader site description</h5>
@@ -601,10 +649,14 @@
             };
 
             const hintSearch = function(url,search){
-                $('#search_string').text(search).css('transform','scale(2.5)').fadeIn();
-                $('#info').text("Repeat Search For: " + search).css('transform','scale(2.5)').css('z-index','20').css('padding','1em').fadeIn();
+                search = search.replace("Search","").replace("For","").replace(":","");
+                $('#search_string').text(search).css('color','red').fadeIn();
+                $('#info').text("Repeat Search For: " + search).css('color','red').fadeIn();
 
                 $(".do-search").on("mouseover mouseenter", function(){
+                    
+                    $(this).tooltip();
+                    $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search).attr('data-placement','left');
                     $(this).focus();
 
                     $(this).on('mouseleave',function() {
@@ -662,6 +714,73 @@
                 },3000);
             };
         
+           
+            const getPreviousSearches = (carimages) => {
+                console.log(carimages.length);
+                if(carimages.length > 0){
+                    let count = 0;
+                    let nochild = 1;
+                    let count2 = 0;
+                    $('#search_results').html('');
+                    $('#search_results').append('<div class="row text-center w-100 m-1"></div>');
+                    for(image of carimages){
+                        let carsite = image.carsite;
+                        let search = image.search;
+                        console.log(search);
+                        let el = $(`<div class="col">
+                            <img src="${image.link}" class="seach-image img-fluid img-thumbnail" alt="Car Image">
+                            <button type="button" class="do-search" onclick="prepareSearch('${carsite}','${search}')" onmouseover="{hintSearch('${carsite}','${search}');}"  
+                                    style="position:relative;left:30%;top:-30%;font-size:0.5em;display:none;z-index:30;"class="btn btn-primary">Load Search</button>
+                            </div>`);
+                        
+                        if(count > 7){
+                            console.log("appending");
+                            $('#search_results').append('<div class="row text-center w-100 m-1"></div>');
+                            nochild++;
+                            count = 0;
+                        }
+
+                        $('#search_results').append(el);
+                        count++;     
+                        count2++;
+                        if(count2 > 100)
+                            break;                      
+
+                    }
+
+                    $('.img-fluid').parent().on('mouseover',function(){
+                        $(this).find('.do-search').css('display','block');
+                        $(this).css('z-index','20').css('transform','scale(1.5)').css('margin-top','5%');
+
+                    });
+
+                    $('.img-fluid').parent().on('mouseleave',function(){
+                        $(this).find('.do-search').css('display','none');
+                        $(this).css('z-index','1').css('transform','scale(1)').css('margin-top','0');
+
+                    }); 
+                }
+                else {
+                    $('#search_results').html('');
+                }
+            
+            };
+
+            const clearSearches = () => {
+                getPreviousSearches([])
+                var myText = JSON.stringify({"carimages":[]});
+                console.log('Textarea: '+myText);
+                var url ="save.php";
+                $.post(url, {"myText": myText}, function(data){
+                    console.log('response from the callback function: '+ data); 
+                    window.location.reload(); 
+                }).fail(function(jqXHR){
+                    alert(jqXHR.status +' '+jqXHR.statusText+ ' $.post failed!');
+                });    
+
+
+            };
+
 
 
             $(document).ready(function(){
@@ -702,49 +821,7 @@
                 fetch('./data.json')
                     .then((response) => response.json())
                     .then((json) => {
-                        console.log(json.carimages.length);
-                        let count = 0;
-                        let nochild = 1;
-                        let count2 = 0;
-                        $('#search_results').html('');
-                        $('#search_results').append('<div class="row text-center w-100 m-1"></div>');
-                        for(image of json.carimages){
-                           let carsite = image.carsite;
-                           let search = image.search;
-                           console.log(search);
-                           let el = $(`<div class="col">
-                                <img src="${image.link}" class="seach-image img-fluid img-thumbnail" alt="Car Image">
-                                <button type="button" class="do-search" onclick="prepareSearch('${carsite}','${search}')" onmouseenter="hintSearch('${carsite}','${search}')"  
-                                     style="position:relative;left:30%;top:-30%;font-size:0.5em;display:none;"class="btn btn-primary">Load Search</button>
-                               </div>`);
-                            
-                            if(count > 7){
-                                console.log("appending");
-                                $('#search_results').append('<div class="row text-center w-100 m-1"></div>');
-                                nochild++;
-                                count = 0;
-                            }
-
-                            $('#search_results').append(el);
-                            count++;     
-                            count2++;
-                            if(count2 > 100)
-                                break;                      
-
-                        }
-
-                        $('.img-fluid').parent().on('mouseover',function(){
-                            $(this).find('.do-search').css('display','block');
-                            $(this).css('z-index','20').css('transform','scale(2.5)').css('margin-top','5%');
-
-                        });
-
-                        $('.img-fluid').parent().on('mouseleave',function(){
-                            $(this).find('.do-search').css('display','none');
-                            $(this).css('z-index','1').css('transform','scale(1)').css('margin-top','0');
-
-                        }); 
-
+                      getPreviousSearches(json.carimages);
                     });
 
            
@@ -794,122 +871,118 @@
        
     </head>
     <body>    
-        <div id="jumbo" class="p-2 bg-primary text-white rounded">
-            <div id="carinfo_header" class="container">
-                <div id="get_car_info" class="row text-center justify-content-center w-100 m-1">
-                    <h1>Get Car Info</h1>
+        <div id="outer">
+            <div id="jumbo" class="p-2 bg-primary text-white rounded container">
+                <div id="carinfo_header" class="row">
+                    <div id="get_car_info" class="row text-center justify-content-center w-100 m-1">
+                        <h1>Get Car Info</h1>
+                    </div>
+                    <div id="site_instructions" class="row text-center justify-content-center">
+                        <div id="info_carousel" class="carousel slide" data-bs-ride="carousel"></div>
+                    </div>   
                 </div>
-                <div class="row text-center justify-content-center">
-                    <div id="info_carousel" class="carousel slide" data-bs-ride="carousel"></div>
-                </div>   
-                <div class="row text-center justify-content-center">
-                    <div class="col"></div>
-                    <div class="col"></div>
-                    <div id="before_carinfo_dropdown" class="col text-center mb-2">
-                        <div id="carinfo_dropdown" class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu4" data-bs-toggle="dropdown" aria-expanded="false">
-                                Choose Car Site
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu4"> 
-                            </ul>
-                        </div>  
-                    </div>
-                    <div class="col-4" id="site_selected" style="display:none;">
-                        <h4></h4>
-                    </div>
-                    <div class="col"></div>
-                    <div class="col"></div> 
-                </div>           
-                
-            </div>   
-            <div class="container"> 
-                <div class="row">
-                    <div class="col">
-                        <div id="make_dropdown" class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1" data-bs-toggle="dropdown" aria-expanded="false">
-                                Car Make
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="height:350px; overflow-y: scroll;">                  
-                            </ul>
-                        </div>     
-                    </div> 
-                    <div class="col">  
-                        <div id="model_dropdown" class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
-                                Car Model
-                            </button>
-                            <ul class="dropdown-menu" style="height:350px; overflow-y: scroll;" aria-labelledby="dropdownMenu2">                  
-                            </ul>
-                        </div>    
-                    </div>  
-                    <div class="col">
-                    <div id="year_dropdown" class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu3" data-bs-toggle="dropdown" aria-expanded="false">
-                                Car Year
-                            </button>
-                            <ul class="dropdown-menu" style="height:350px; overflow-y: scroll;" aria-labelledby="dropdownMenu3">                  
-                            </ul>
-                        </div>    
-                    </div>    
-                    <div class="col-2">
-                        <div id="location" class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Input Location" aria-label="Car Location" aria-describedby="basic-addon2"  disabled>
-                        </div>
-                    </div>
-                    <div class="col-4"><h2 id="search_string" class="p-2 pb-2"></h2></div>    
-                    
-                    <div class="col"><button id="dosearch" type="button" class="btn btn-light">Do Search</button></div>     
-                    <div class="col"><button id="reset" onclick="window.location.reload()" type="button" class="btn btn-light">Reset/Previous Searches</button></div>                
-                </div>     
+
                 <div class="row">
                     <div id="showCar" class="carousel slide align-items-center justify-content-center mt-2" data-bs-ride="carousel"></div>
                 </div>    
-                <div id="siteInfo" class="row"></div> 
-                <div id="iconDisplay" class="carousel slide align-items-center justify-content-center m-1" data-bs-ride="carousel">
+                <div id="siteInfo" class="row mb-2"></div> 
+                <div id="iconDisplay" class="carousel slide align-items-center justify-content-center row" data-bs-ride="carousel">
                     <div class="carousel-inner rounded">
-                        <div class="carousel-item active align-items-center p-3 cargurus">
-                            <img src="images/cargurus.png" style="margin-left:38%" class="d-block w-25" alt="CarGurus">
+                        <div class="carousel-item active align-items-center cargurus">
+                            <img src="images/cargurus.png" style="position:relative;margin: 0 0 25% 25%" class="d-block" width="200" height="50" alt="CarGurus">
                         </div>
-                        <div class="carousel-item p-3 site-carmax">
-                            <img src="images/carmax.png" style="margin-left:38%"   class="d-block w-25" alt="CarMax">
+                        <div class="carousel-item site-carmax">
+                            <img src="images/carmax.png" style="position:relative;margin: 0 0 25% 25%"   class="d-block" width="200" height="50" alt="CarMax">
                         </div>
-                        <div class="carousel-item p-3 site-usnews">
-                            <img src="images/us news & world reports.png" style="margin-left:38%"  class="d-block w-25" alt="US News & Reports">
+                        <div class="carousel-item site-usnews">
+                            <img src="images/us news & world reports.png" style="position:relative;margin: 0 0 25% 25%"  class="d-block" width="200" height="50" alt="US News & Reports">
                         </div>
-                        <div class="carousel-item p-3 site-carvana">
-                            <img src="images/carvana.png" style="margin-left:38%"  class="d-block w-25" alt="Carvana">
+                        <div class="carousel-item site-carvana">
+                            <img src="images/carvana.png" style="position:relative;margin: 0 0 25% 25%"  class="d-block" width="200" height="50" alt="Carvana">
                         </div>
-                        <div class="carousel-item p-3 site-truecar">
-                            <img src="images/truecar.png" style="margin-left:38%"  class="d-block w-25" alt="TrueCar">
+                        <div class="carousel-item site-truecar">
+                            <img src="images/truecar.png" style="position:relative;margin: 0 0 25% 25%"  class="d-block" width="200" height="50" alt="TrueCar">
                         </div> 
-                        <div class="carousel-item p-3 site-autotrader">
-                            <img src="images/autotrader.png" style="margin-left:38%"  class="d-block w-25" alt="Autotrader">
+                        <div class="carousel-item site-autotrader">
+                            <img src="images/autotrader.png" style="position:relative;margin-left:38%"  class="d-block" width="200" height="50" alt="Autotrader">
                         </div> 
                     </div>
-                </div>       
+                </div>  
+
+                <div class="row text-center justify-content-center">   
+                    <h2 id="site_selected" style="display:none;"></h2>
+                </div>   
+            </div>
+            
+            <div id="sideBar" class="container p-2">      
+                <div id="carinfo_dropdown" class="dropdown mb-1">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu4" data-bs-toggle="dropdown" aria-expanded="false">
+                        Choose Car Site
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu4"> 
+                    </ul>
+                </div>  
+                <div id="make_dropdown" class="dropdown mb-1">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Car Make
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="height:350px; overflow-y: scroll;">                  
+                    </ul>
+                </div>  
+                <div id="model_dropdown" class="dropdown mb-1">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                        Car Model
+                    </button>
+                    <ul class="dropdown-menu" style="height:350px; overflow-y: scroll;" aria-labelledby="dropdownMenu2">                  
+                    </ul>
+                </div>    
+            
+                <div id="year_dropdown" class="dropdown mb-1">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu3" data-bs-toggle="dropdown" aria-expanded="false">
+                        Car Year
+                    </button>
+                    <ul class="dropdown-menu" style="height:350px; overflow-y: scroll;" aria-labelledby="dropdownMenu3">                  
+                    </ul>
+                </div>    
+                
+                <div id="location" class="input-group mb-1">
+                    <input type="text" class="form-control" placeholder="Input Location" aria-label="Car Location" aria-describedby="basic-addon2"  disabled>
+                </div>
+                <div class="container">
+                    <h2 id="search_string" class="p-2 pb-2"></h2>
+                </div>
+                <div class="container">
+                    <button id="dosearch" type="button" class="btn btn-light">Do Search</button>    
+                    <button id="reset" onclick="window.location.reload()" type="button" class="btn btn-light">Reset/Previous Searches</button> 
+                    <button type="button" onclick="clearSearches()" class="btn btn-light">Clear All Searches</button>    
+                </div>
+                
+            </div>    
+            
+            <div id="car_info" class="container p-2 text-center mt-3">            
+                <div class="row text-center mt-1">
+                    <h5 id="info" style="color:blue">Select Site and Car For a Lot Of Info</h5>
+                </div>
+                <div class="row justify-content-center">
+                    <div id="search" class="col gcse-searchbox" data-as_sitesearch="" data-gname="search"></div>
+                </div>   
+                <div class="row" id="results_wrapper">
+                    <div id="results" class="gcse-searchresults" data-gname="search"></div>
+                </div>   
+            </div>
+            <div class="container" id="searchInfo">
+                <div id="previous_searches" class="col text-center p-1 mt-1">
+                        <h3>Images Represent Previous Searches<br>Hover and Click to Repeat Search</h3>
+                </div>  
+                <div id="search_results" class="row m-2 justify-content-center">        
+                        
+                    <div id="custom_results" class="col" ></div>         
+                </div>        
             </div>
         </div>
-       
-        <div id="car_info" class="container p-2 text-center">            
-            <div class="row text-center mt-1">
-                <h5 id="info" style="color:blue">Select Site and Car For a Lot Of Info</h5>
-            </div>
-            <div class="row justify-content-center">
-                <div id="search" class="col gcse-searchbox" data-as_sitesearch="" data-gname="search"></div>
-            </div>   
-            <div class="row" id="results_wrapper">
-                <div id="results" class="gcse-searchresults" data-gname="search"></div>
-            </div>   
-        </div>
-        <div class="container">
-            <div id="previous_searches" class="col text-center p-1 mt-1">
-                    <h3>Images Represent Previous Searches<br>Hover and Click to Repeat Search</h3>
-            </div>  
-            <div id="search_results" class="row m-2 justify-content-center">        
-                      
-                <div id="custom_results" class="col" ></div>         
-            </div>        
-        </div>
+        
+        
+        
         <!--div class="gcse-searchbox"></div>
         <div class="gcse-searchresults"></div-->
         <!-- Option 1: Bootstrap Bundle with Popper -->
