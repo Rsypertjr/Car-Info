@@ -773,7 +773,7 @@
                 var url ="save.php";
                 $.post(url, {"myText": myText}, function(data){
                     console.log('response from the callback function: '+ data); 
-                    window.location.reload(); 
+                    //window.location.reload(); 
                 }).fail(function(jqXHR){
                     alert(jqXHR.status +' '+jqXHR.statusText+ ' $.post failed!');
                 });    
