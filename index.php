@@ -150,21 +150,7 @@
             height:30%;
         }
 
-        #location {
-            position:relative;
-            width:88%;
-            display:inline;
-            
-        }
-       
-        #done {
-            position:relative;
-            width:10%;
-            display: inline-block;
-            float:right;
-            height: 38px;
-            padding:2px;
-        }
+    
         
         </style>
       
@@ -461,7 +447,7 @@
                         .on("click",function(e){
                             let droptext = $(e.target).text();
                             $('#site_selected').fadeIn().find('h4').text("Site Selected: " + droptext);
-
+                            $('#location > input').attr("disabled",true)
                             $('#iconDisplay').hide();                            
                             $("#info").text(''); 
                             $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
@@ -509,7 +495,10 @@
                                         }
 
                                         console.log(years);
-                                        $('#location > input').attr("disabled",false);
+                                        $('#location > input').attr("disabled",false).on("click",function(){
+                                            $(this).val('');
+                                        });
+
                                        
 
                                         
@@ -812,6 +801,7 @@
             const locationInput = (val) => {              
                 $('#done').on("click",function(){
                     $("#search_string").text("Search For: " + base_string + " " + val);
+                    $('#location > input').val('Input Location').attr('placeholder','Input Location');
                 });
             }
 
@@ -987,9 +977,14 @@
                     </ul>
                 </div>    
                 
-                <div id="location" class="input-group mb-2">
-                    <input id="location" type="text" class="form-control" value="" placeholder="Input Location" onkeyup="locationInput(this.value)" aria-label="Car Location" aria-describedby="basic-addon2"  disabled>
-                    <button id="done">Done</button>
+                <div class="btn-group" role="group" aria-label="Basic example">      
+                    <div id="location"  class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text" id="btnGroupAddon">@</div>
+                        </div>
+                        <input type="text" class="form-control" value="" placeholder="Input Location" onkeyup="locationInput(this.value)" aria-label="Car Location" aria-describedby="btnGroupAddon" disabled>
+                    </div>
+                    <button id="done" type="button" class="btn btn-secondary">Done</button>
                 </div>
                 <div>
                     <h2 id="search_string" class="mb-2 mt-2"></h2>
