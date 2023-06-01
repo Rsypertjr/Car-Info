@@ -150,7 +150,21 @@
             height:30%;
         }
 
+        #location {
+            position:relative;
+            width:88%;
+            display:inline;
+            
+        }
        
+        #done {
+            position:relative;
+            width:10%;
+            display: inline-block;
+            float:right;
+            height: 38px;
+            padding:2px;
+        }
         
         </style>
       
@@ -167,6 +181,7 @@
             var carsite_url = "";
             var carousel_inner = "";
             var carousel_inner2 = "";
+            var base_string = "";
 
             var imgArr = {"carimages":[]};
             const doGoogleSearch = function(url) {
@@ -485,7 +500,8 @@
                                                     let val = e.target.value;
                                                     let str = val.toString() + " " +  prior3.replace("Search For: ","");
                                                     $("#search_string").text("Search For: " + str);
-                                                    searchString = str;
+                                                    searchString = str;  
+                                                    base_string = searchString;                                                   
                                                     $("#dropdownMenu2").add('.dropdown-menu').removeClass('show');                                                    
                                                     $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                                 });
@@ -506,7 +522,7 @@
                                 //$("#dropdownMenu2").add('.dropdown-menu').addClass('show');
                                 $("#custom_results").html('');
                                 $('#showCar').html('');
-
+                                     
                                 
                             })
                             .on('mousedown',function(){
@@ -515,12 +531,15 @@
                             $('#make_dropdown > ul').append(el);                  
                         }
 
+                        
                         $('#location > input').on("change",function(e){
                            
                             searchString = "Search For: " + searchString + " " + e.target.value;   
                             $("#search_string").text(searchString); 
+                           
 
                         });
+                        
 
                         
                     });               
@@ -790,6 +809,13 @@
                     });
             };
 
+            const locationInput = (val) => {              
+                $('#done').on("click",function(){
+                    $("#search_string").text("Search For: " + base_string + " " + val);
+                });
+            }
+
+
             $(document).ready(function(){
                 const statements = [
                     {el: `<div class="container"><p class="hdinfo rounded">Get Car Info from Different Sites!</p></div>`},
@@ -864,24 +890,20 @@
                     });    
                 });
             */
-            $('#model_dropdown > ul').on("mouseover",function(){
-               
+            $('#model_dropdown > ul').on("mouseover",function(){               
                   let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
                   if(test === 0){
                     alert("Please select Car Make First!");
                   }
+                });
 
-            });
 
-
-            $('#year_dropdown > ul').on("mouseover",function(){
-               
-               let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
-               if(test === 0){
-                 alert("Please select Car Model First!");
-               }
-
-         });
+            $('#year_dropdown > ul').on("mouseover",function(){               
+                    let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
+                    if(test === 0){
+                        alert("Please select Car Model First!");
+                    }
+                });
 
 
 
@@ -965,13 +987,14 @@
                     </ul>
                 </div>    
                 
-                <div id="location" class="input-group mb-1">
-                    <input type="text" class="form-control" placeholder="Input Location" aria-label="Car Location" aria-describedby="basic-addon2"  disabled>
+                <div id="location" class="input-group mb-2">
+                    <input id="location" type="text" class="form-control" value="" placeholder="Input Location" onkeyup="locationInput(this.value)" aria-label="Car Location" aria-describedby="basic-addon2"  disabled>
+                    <button id="done">Done</button>
                 </div>
-                <div class="container">
-                    <h2 id="search_string" class="p-2 pb-2"></h2>
+                <div>
+                    <h2 id="search_string" class="mb-2 mt-2"></h2>
                 </div>
-                <div class="container">
+                <div>
                     <button id="dosearch" type="button" class="btn btn-light">Do Search</button>    
                     <button id="reset" onclick="loadCarData()" type="button" class="btn btn-light">Reset/Previous Searches</button> 
                     <button type="button" onclick="clearSearches()" class="btn btn-light">Clear All Searches</button>    
