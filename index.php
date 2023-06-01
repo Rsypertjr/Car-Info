@@ -649,7 +649,7 @@
                 $('#search_results').attr('top','-40%');
                 $('#search_string').text('').css('transform','scale(1)').fadeIn();
                 $('#info').text("Select Site and Car For a Lot Of Info").css('transform','scale(1)').css('z-index','1').css('padding','3px').fadeIn();
-                $('#search_string').text("Search For: " + search);
+                $('#search_string').text(search);
                 $('#iconDisplay').fadeOut();
                 $('#previous_searches').fadeOut();
                 setInfoDisplay();
@@ -698,7 +698,7 @@
                     else
                         text = $('#info').text().replace(res," was Searched");
 
-                    let addon = $("#search_string").text().replace("Search For:","for ");
+                    let addon = $("#search_string").text().replace("Search For:","for ").replace("Search For:","");
                     $('#info').text(text);
 
                     $('#info').append("<p>" + addon + "</p>");
