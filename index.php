@@ -767,7 +767,7 @@
             };
 
             const clearSearches = () => {
-                getPreviousSearches([])
+                $('#search_results').html('');
                 var myText = JSON.stringify({"carimages":[]});
                 console.log('Textarea: '+myText);
                 var url ="save.php";
@@ -781,7 +781,14 @@
 
             };
 
-
+            const loadCarData = () => {
+                $('#search_results').html('');
+                fetch('./data.json')
+                    .then((response) => response.json())
+                    .then((json) => {
+                      getPreviousSearches(json.carimages);
+                    });
+            };
 
             $(document).ready(function(){
                 const statements = [
@@ -818,12 +825,7 @@
                 
                
                 // Fetch Data for and Do Logic for Previous Search Display
-                fetch('./data.json')
-                    .then((response) => response.json())
-                    .then((json) => {
-                      getPreviousSearches(json.carimages);
-                    });
-
+                loadCarData();
            
                     
              
@@ -971,7 +973,7 @@
                 </div>
                 <div class="container">
                     <button id="dosearch" type="button" class="btn btn-light">Do Search</button>    
-                    <button id="reset" onclick="window.location.reload()" type="button" class="btn btn-light">Reset/Previous Searches</button> 
+                    <button id="reset" onclick="loadCarData()" type="button" class="btn btn-light">Reset/Previous Searches</button> 
                     <button type="button" onclick="clearSearches()" class="btn btn-light">Clear All Searches</button>    
                 </div>
                 
