@@ -862,7 +862,25 @@
                     });    
                 });
             */
-           
+            $('#model_dropdown > ul').on("mouseover",function(){
+               
+                  let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
+                  if(test === 0){
+                    alert("Please select Car Make First!");
+                  }
+
+            });
+
+
+            $('#year_dropdown > ul').on("mouseover",function(){
+               
+               let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
+               if(test === 0){
+                 alert("Please select Car Model First!");
+               }
+
+         });
+
 
 
             });

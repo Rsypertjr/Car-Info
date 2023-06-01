@@ -258,7 +258,7 @@
         {
             "make": {
                 "name":"Tesla",
-                "model": ["Model 3","Model S","Model X","Model Y","Roadster"]
+                "models": ["Model 3","Model S","Model X","Model Y","Roadster"]
             }
         },
         {
