@@ -643,8 +643,8 @@
             const prepareSearch = function(url,search){
                 carsite_url = url;
                 loadMenus(search);
-                loadGSC();
-                $('#search').html('');
+                loadGSC();  
+                $('#search').html('').fadeOut();
                 $('#search_results').html('<div id="custom_results" class="col" ></div>');
                 $('#search_results').attr('top','-40%');
                 $('#search_string').text('').css('transform','scale(1)').fadeIn();
@@ -667,7 +667,7 @@
                     $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search).attr('data-placement','left');
                     $(this).focus();
 
-                    $(this).on('mouseleave',function() {
+                    $(this).on('mouseleave',function() {                      
                         $('#search_string').text('').css('transform','scale(1)').fadeIn();
                         $('#info').text("Select Site and Car For a Lot Of Info").css('transform','scale(1)').css('z-index','1').css('padding','3px').fadeIn();
                     });
@@ -686,22 +686,21 @@
                 setTimeout(function(){
                     google.search.cse.element.getElement('search').clearAllResults();                       
                     $('#gsc-i-id1').attr('data-as_sitesearch',carsite_url);                        
-                    google.search.cse.element.getElement('search').prefillQuery(searchString); 
-                    google.search.cse.element.getElement('search').execute(searchString); 
-
+                    google.search.cse.element.getElement('search').prefillQuery(searchString.replace("Search For:","")); 
+                    google.search.cse.element.getElement('search').execute(searchString.replace("Search For:","")); 
+                    $('#gsc-i-id1').fadeOut();   
                     $('#info').find('#waiting').remove();
                     let pattern = /was Searched.*/g;
                     let res =  $('#info').text().match(pattern);
                     let text;
                     if(!res)
-                        text = $('#info').text().replace("will be Searched","was Searched");
+                        text = $('#info').text().replace("will be Searched","was searched");
                     else
-                        text = $('#info').text().replace(res," was Searched");
+                        text = $('#info').text().replace(res," was searched");
 
                     let addon = $("#search_string").text().replace("Search For:","for ").replace("Search For:","");
-                    $('#info').text(text);
+                    $('#info').html(`<p>${text} using Google Programmable Search<br>${addon}</p>`);
 
-                    $('#info').append("<p>" + addon + "</p>");
                     $("#search_string").text("");
                     //alert(JSON.stringify(imgArr));
                     $('#showCar').css('display','block');
@@ -851,7 +850,6 @@
 
                 $('#dosearch').on("click",function(){
                         loadGSC();
-                        $('#search').fadeOut();
                         $('#search_results').html('<div id="custom_results" class="col" ></div>');
                         $('#search_results').attr('top','-40%');                       
                         if(!carsite_url){
