@@ -810,7 +810,7 @@
                     {el: `<div class="container"><p class="hdinfo rounded">Get Car Info from Different Sites!</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Sites like: CarMax, Cargurus, US News and Reports, and others</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Use Dropdowns to Select Car and Year</p></div>`},
-                    {el: `<div class="container"><p class="hdinfo rounded">Type In Location (State and/or City and/or Zip Code) and PRESS ENTER</p></div>`}, 
+                    {el: `<div class="container"><p class="hdinfo rounded">Type In Location (State and/or City and/or Zip Code) and Press Done</p></div>`}, 
                     {el: `<div class="container"><p class="hdinfo rounded">Year and Location are Optional</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Display Fields Show Search Site and Criteria</p></div>`},
                     {el:`<div class="container"><p class="hdinfo rounded">Press 'Do Search' button and Wait a Just a Moment</p></div>`},
