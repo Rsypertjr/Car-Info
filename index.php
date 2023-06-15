@@ -24,6 +24,7 @@
             width: 90%;
             margin-left:152%;
             float:left;
+            display:block;
         }
        
         #body{
@@ -62,6 +63,7 @@
             float:left;
             height:20%;
             padding:2em 0;
+            display:block;
         }
 
         #search_results {
@@ -119,6 +121,13 @@
         #previous_searches {
             color:blue;
             background-color:lightblue;
+        }
+
+        #current_search {
+            color:blue;
+            background-color:lightblue;
+            display:none;
+            font-size:1.75em;
         }
 
         #iconDisplay > .carousel-inner {
@@ -324,7 +333,16 @@
                     storeImageLinks(imgArr2);
                     //customResults.appendChild(table);     
                     carousel_inner = ''; 
-                    results_accordian = '';              
+                    results_accordian = '';       
+                    let currentSearch1p = $('#current_search > p').text();  
+                    $('#current_search').fadeOut();
+                    $('#current_search > p').text(currentSearch1p.replace('will be searched', 'was searched'));
+                    currentSearch1p = $('#current_search > p').text(); 
+                    let first = currentSearch1p.split('at Location');
+                    console.log(first[1]);
+                   
+                    $('#current_search').html(`<p>${first[0]}<br> at Location ${first[1]}</p>`).fadeIn();
+
                 }
                 return;
             };
@@ -442,6 +460,8 @@
                         $('#carinfo_dropdown > ul > li')
                         .on("click",function(e){
                             let droptext = $(e.target).text();
+                            $('#current_search').fadeIn().text("The " + droptext + "  site will be searched for: ");
+                            $('#searchInfo').css('display','block');
                             $('#dropdownMenu4').text("Site: " + droptext);
                             $('#site_selected').fadeIn().find('h4').text("Site Selected: " + droptext);
                             $('#location > input').attr("disabled",true);
@@ -468,6 +488,12 @@
                                 $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                 $("#dropdownMenu1").text("Make: " + car.make.name);
                                 $("#search_string").text(searchString); 
+
+                                // build current search
+                                let currentSearch = $('#current_search').text();
+                                currentSearch = currentSearch + " " + searchString.replace('Search For:','');
+                                $('#current_search').text(currentSearch);
+
                                 // $('#model_dropdown > ul').html('');
                             
                                 for(const model of car.make.models){
@@ -478,6 +504,12 @@
                                         prior3 = searchString;                                        
                                         $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                         $("#search_string").text(searchString);
+
+                                         // build current search
+                                        let currentSearch = $('#current_search').text();
+                                        currentSearch = currentSearch + " " + searchString.replace('Search For:','').replace(car.make.name,'');
+                                        $('#current_search').text(currentSearch);
+
                                         $("#dropdownMenu2").text("Model: " + model);
                                         for (const year of years.reverse()){
                                             let el = $(`<li><button class="dropdown-item" type="button" value="${year}">${year}</button></li>`)
@@ -485,6 +517,12 @@
                                                     let val = e.target.value;
                                                     let str = val.toString() + " " +  prior3.replace("Search For: ","");
                                                     $("#search_string").text("Search For: " + str);
+
+                                                     // build current search
+                                                    let currentSearch = $('#current_search').text();
+                                                    $('#current_search').text(currentSearch
+                                                        .replace(car.make.name,'').replace(model,'') + val + " " + car.make.name + " " + model);
+
                                                     $("#dropdownMenu3").text("Year: " + year);
                                                     searchString = str;  
                                                     base_string = searchString;                                                   
@@ -528,7 +566,10 @@
                            
                             searchString = "Search For: " + searchString + " " + e.target.value;   
                             $("#search_string").text(searchString); 
-                           
+                            let currentSearch = $('#current_search').text();
+                            $('#current_search').html(`<p>${currentSearch}<br>at Location of ${e.target.value}</p>`);
+                              
+    
 
                         });
                         
@@ -663,18 +704,23 @@
                 search = search.replace("Search","").replace("For","").replace(":","");
                 $('#search_string').text(search).css('color','red').fadeIn();
                 $('#info').text("Repeat Search For: " + search).css('color','red').fadeIn();
+                let previousSearches = $('#previous_searches').html();
 
                 $(".do-search").on("mouseover mouseenter", function(){
                     
                     $(this).tooltip();
                     $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search).attr('data-placement','left');
                     $(this).focus();
+                    $('#previous_searches').html(`<h1>Repeat Search For: ${search}</h1>`).fadeIn();
 
-                    $(this).on('mouseleave',function() {                      
+                    $(this).on('mouseleave',function() {       
+                        $('#previous_searches').html(previousSearches);             
                         $('#search_string').text('').css('transform','scale(1)').fadeIn();
                         $('#info').text("Select Site and Car For a Lot Of Info").css('transform','scale(1)').css('z-index','1').css('padding','3px').fadeIn();
                     });
                 });
+
+            
             };
 
            
@@ -742,7 +788,7 @@
                         let el = $(`<div class="col">
                             <img src="${image.link}" class="seach-image img-fluid img-thumbnail" alt="Car Image">
                             <button type="button" class="do-search" onclick="prepareSearch('${carsite}','${search}')" onmouseover="{hintSearch('${carsite}','${search}');}"  
-                                    style="position:relative;left:30%;top:-30%;font-size:0.5em;display:none;z-index:30;"class="btn btn-primary">Load Search</button>
+                                    style="position:relative;left:30%;top:-30%;font-size:0.90em;display:none;z-index:30;"class="btn btn-primary">Load Search</button>
                             </div>`);
                         
                         if(count > 7){
@@ -762,12 +808,14 @@
 
                     $('.img-fluid').parent().on('mouseover',function(){
                         $(this).find('.do-search').css('display','block');
+                        $(this).siblings().css('opacity',0.60);
                         $(this).css('z-index','20').css('transform','scale(1.5)').css('margin-top','5%');
 
                     });
 
                     $('.img-fluid').parent().on('mouseleave',function(){
                         $(this).find('.do-search').css('display','none');
+                        $(this).siblings().css('opacity',1);
                         $(this).css('z-index','1').css('transform','scale(1)').css('margin-top','0');
 
                     }); 
@@ -795,6 +843,7 @@
 
             const loadCarData = () => {
                 $('#search_results').html('');
+                $('#current_search').fadeOut();
                 fetch('./data.json')
                     .then((response) => response.json())
                     .then((json) => {
@@ -987,7 +1036,7 @@
                         </div>
                         <input type="text" class="form-control" value="" placeholder="Input Location" onkeyup="locationInput(this.value)" aria-label="Car Location" aria-describedby="btnGroupAddon" disabled>
                     </div>
-                    <button id="submit" type="button" class="btn btn-secondary">Submit</button>
+                    <button id="submit" type="button" class="btn btn-secondary w-100">Submit Location</button>
                 </div>
                 <div>
                     <h2 id="search_string" class="mb-2 mt-2"></h2>
@@ -1015,6 +1064,7 @@
                 <div id="previous_searches" class="col text-center p-1 mt-1">
                         <h3>Images Represent Previous Searches<br>Hover and Click to Repeat Search</h3>
                 </div>  
+                <div id="current_search" class="col text-center p-1 mt-1"></div>
                 <div id="search_results" class="row m-2 justify-content-center">        
                         
                     <div id="custom_results" class="col" ></div>         
