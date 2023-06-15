@@ -169,11 +169,18 @@
             var us_news_world_report_url = "https://cars.usnews.com";
             var carvana_url = "https://carvana.com";
             var carsite_url = "";
+            var the_car_site = "";
+            var the_car_make = "";
+            var the_car_model = "";
+            var the_car_year = "";
+            var the_car_location = "";
             var carousel_inner = "";
             var carousel_inner2 = "";
             var base_string = "";
 
             var imgArr = {"carimages":[]};
+
+            // Performs Acutal Google Programmable Search and sets search field element and results field element
             const doGoogleSearch = function(url) {
 
                 window.__gcse = {};
@@ -201,7 +208,8 @@
                     );
           
            };
-
+            
+           //  get Results from Google Programmable API
             const getResults = function(name, q, promos, results, resultsDiv){
                 customResults = $('#custom_results');
                
@@ -209,6 +217,7 @@
                 
                 let results_accordian = $('<div class="accordion" id="accordionExample">');
 
+                // Promotions UI element
                 const makePromoElt = (promo) => {
                     const anchor = document.createElement('a');
                     anchor.href = promo['url'];
@@ -219,24 +228,35 @@
                     anchor.appendChild(span);
                     return anchor;           
                 };
-                
+
+                //Build UI elements from google programmable search in html/ui components
+                // Including adding to image carousel
                 const makeResultsParts = (result) => {
+
                     const anchor = document.createElement('a');
                     anchor.href = result['url'];
                     anchor.target = '_blank';
                     anchor.classList.add('gs_title');
                     anchor.appendChild(document.createTextNode(result['visibleUrl']));
+
                     const ahref = result['visibleUrl'];
+
+                    // Global results Object
                     resultsObj.anchor = anchor;
-                    resultsObj.image = result['thumbnailImage'];
+                    resultsObj.image = result['thumbnailImage'];                    
                     resultsObj.content = result['content'];
-                    resultsObj.title = result['title'];                   
-                    const span = document.createElement('span');                    
-                    resultsObj.span = span;
+                    resultsObj.title = result['title']; 
+
+                    const span = document.createElement('span');    
+                    span.innerHTML = ' ' + result['title'];                   
+                    
+                    // Global Results Objects
+                    resultsObj.span = span;                   
                     resultsObjArr.push(resultsObj); 
-                    span.innerHTML = ' ' + result['title'];   
+                   
                     const content = result['contentNoFormatting'];
                     const title = result['titleNoFormatting'];
+
                     let carousel_item = '';
                     if(carousel_inner.children().length == 0)
                         carousel_item = $('<div class="carousel-item active">');
@@ -245,7 +265,13 @@
 
                     let img = $('<img class="d-block">')
                     if( typeof(result['thumbnailImage']) !== 'undefined'){
-                        if( typeof(result['thumbnailImage'].url !== 'undefined' && !imgArr.carimages.includes(result['thumbnailImage'].url))){
+                        if( typeof(result['thumbnailImage'].url) !== 'undefined' && 
+                          // Try to filter out pre-existing thumbnails from Global imgArr object
+                            !imgArr.carimages.filter((carimage) => {
+                                carimage.link == result['thumbnailImage'].url
+                                })
+                            )
+                            {
                             img.attr("src",result['thumbnailImage'].url);
                             img.attr("height",parseFloat(result['thumbnailImage'].height)*0.75);
                             img.attr("width",parseFloat(result['thumbnailImage'].width)*0.75);
@@ -258,24 +284,28 @@
                            
                         }  
                     }       
-                   
-                    return [anchor, span, content, title,imgArr];                 
+                    // Return UI elements
+                    return [anchor, span, content, title, imgArr];                 
                 };
 
              
 
-
+                // For promotions returned by google programmable API
+                // Use UI element to put in a table 
+                // Leaving empty however
                 const table = document.createElement('table');
                 if (promos) {
                     for (const promo of promos) {
                         const row = table.insertRow(-1);
                         const cell = row.insertCell(-1);
                         cell.appendChild(makePromoElt(promo));
+                        // Not appending to table Now
                     }
-                    resultsDiv.appendChild(table);
+                    resultsDiv.appendChild(table);  // append promotions table to internal Results Div which is sent to designated results field
                     resultsDiv.appendChild(document.createElement('br'));
                 }
                 
+                // Build Bootstrap Accordian from UI elements built from results
                 if (results) {
                     //resultsDiv.innerHTML = '';
                     customResults.innerHTML = '';
@@ -325,24 +355,37 @@
                           results_accordian.append(accordian_item);
                           count++;
                     }
+
+
                     $('#showCar').append(carousel_inner);
                     $('#iconDisplay').hide();
-                    resultsDiv.appendChild(table);
+
+                   
                     customResults.find('#waiting').hide();
+                    // Append Accordian built from results to custom field instead location
                     customResults.append(results_accordian);
+
+                    // Not using promotions
+                    //customResults.appendChild(table);    
+
+                    // Send Image Links to file
                     storeImageLinks(imgArr2);
-                    //customResults.appendChild(table);     
+                    
+                    // Resets
                     carousel_inner = ''; 
-                    results_accordian = '';       
+                    results_accordian = '';    
+                    
+                    // Build information fields
                     let currentSearch1p = $('#current_search > p').text();  
                     $('#current_search').fadeOut();
                     $('#current_search > p').text(currentSearch1p.replace('will be searched', 'was searched'));
                     currentSearch1p = $('#current_search > p').text(); 
                     let first = currentSearch1p.split('at Location');
                     console.log(first[1]);
-                   
-                    $('#current_search').html(`<p>${first[0]}<br> at Location ${first[1]}</p>`).fadeIn();
-
+                    if( typeof(first[1]) !== 'undefined')
+                        $('#current_search').html(`<p>${first[0]}<br> at Location ${first[1]}</p>`).fadeIn();
+                    else
+                        $('#current_search').html(`<p>${first[0]}</p>`).fadeIn();
                 }
                 return;
             };
@@ -355,12 +398,12 @@
                 return true;
             };
 
-
+            // Called by Google Programmable API when results are ready
             const myResultsReadyCallback = function(name, q, promos, results, resultsDiv){             
                 
                     console.log("searching...");
                     clearResults();
-                    getResults(name, q, promos, results, resultsDiv);
+                    getResults(name, q, promos, results, resultsDiv);  // Retrieve Results
                 return true;
             };
 
@@ -371,9 +414,9 @@
                     .then((response) => response.json())
                     .then((json) => {
                         let imgArr2 = json;
-                        //console.log(json);
                         let no_carimages = imgArr2.carimages.length;
-                        //console.log(no_carimages + ":" + imgArr.carimages.length);
+
+                        // Only store 200 images
                         if(no_carimages > 200)
                             imgArr2 = {"carimages":[]};
    
@@ -382,7 +425,6 @@
                                 let test = imgArr.carimages.filter(function(img){
                                     return img.link == image.link;
                                 });
-                                //console.log(test);
                                 if( test.length == 0)
                                     imgArr.carimages.push(image);
                             }
@@ -391,28 +433,22 @@
                             imgArr2 = {"carimages":[]};
                             imgArr.carimages.push(image);
                         }
-                        //console.log("new length:",imgArr.carimages.length);
+                       
+                        // Post json formatted text to PHP file
                         var myText = JSON.stringify(imgArr);
-                        //console.log('Textarea: '+myText);
                         var url ="save.php";
                         $.post(url, {"myText": myText}, function(data){
-
-                        //console.log('response from the callback function: '+ data); 
-                        }).fail(function(jqXHR){
-                            alert(jqXHR.status +' '+jqXHR.statusText+ ' $.post failed!');
-                        });    
-
-
+                            }).fail(function(jqXHR){
+                                alert(jqXHR.status +' '+jqXHR.statusText+ ' $.post failed!');
+                            });    
                     });
                 };
-    
+                   
 
 
 
             // Insert it before the Search Element code snippet so the global properties like parsetags and callback
-            // are available when cse.js runs.
-            
-           
+            // are available when cse.js runs.  
             window.__gcse = {
                 parsetags: 'explicit',
                 initializationCallback: myInitCallback,
@@ -425,28 +461,31 @@
 
         };
 
+        // Loading All Dropdown Menus and Events
         const loadMenus = function(search=null)
             {
                 searchString = '';           
                 let count = 0;
                 let prior3 = "";
+
+                // Build years array for dropdown menus
                 for(let i = 1950;i <= new Date().getFullYear();i++){
                     years[count] = i;
                     count++;
                 }
                 
-
+                // Fetch Car info for menus from Json file
                 fetch('cars.json')
                     .then((response) => response.json())
-                    .then((json) => {
-                        
-                        console.log(json);
+                    .then((json) => {                        
+                        //console.log(json);
                         const cars = json.cars;
                         if(search)
                             searchString = search;
                         else
                             searchString = 'Search For: ';
 
+                        // Build Site Selection Dropdown Menu
                         $('#carinfo_dropdown > ul').html('');
                         const car_dropdown_items = `
                             <li><button class="dropdown-item active" type="button" value="https://www.cargurus.com">Car Gurus</button></li>   
@@ -457,10 +496,18 @@
                             <li><button class="dropdown-item" type="button" value="https://autotrader.com">Autotrader</button></li>   
                         `;
                         $('#carinfo_dropdown > ul').append(car_dropdown_items);
-                        $('#carinfo_dropdown > ul > li')
-                        .on("click",function(e){
+
+                        // Car Site dropdown menu click event
+                        $('#carinfo_dropdown > ul > li').on("click",
+                        function(e){
                             let droptext = $(e.target).text();
+                            carsite_url = e.target.value;
+                            the_car_site = droptext;
+                            /* Build Search Info Field sent to Google Programmable API
+                            // Also open the Car Make menu and close/disable model and year menus
+                            */
                             $('#current_search').fadeIn().text("The " + droptext + "  site will be searched for: ");
+
                             $('#searchInfo').css('display','block');
                             $('#dropdownMenu4').text("Site: " + droptext);
                             $('#site_selected').fadeIn().find('h4').text("Site Selected: " + droptext);
@@ -468,8 +515,6 @@
                             $('#iconDisplay').hide();                            
                             $("#info").text(''); 
                             $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
-                            carsite_url = e.target.value;   
-                            let info = '';
                             $('#showCar').css('display','none');
                             $('#siteInfo').css('display','block');
                             $('#iconDisplay').find('.carousel-item').css('display','none');  
@@ -480,32 +525,42 @@
                         });
                         for (const car of cars)
                         {
-                            let prior1 = searchString; 
-                            let el = $(`<li><button class="dropdown-item make-button" type="button">${car.make.name}</button></li>`)                            
-                            .on("click",function(){
+                            let prior1 = searchString; // For next build step
+                            let el = $(`<li><button class="dropdown-item make-button" type="button">${car.make.name}</button></li>`)                                                   
+                            .on("click",function(){ 
+                                // Build search string sent to Google Programmable API
+                                the_car_make = car.make.name;
                                 searchString = 'Search For: ';
-                                searchString = prior1 + car.make.name + " ";
-                                $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
-                                $("#dropdownMenu1").text("Make: " + car.make.name);
+                                searchString = prior1 + the_car_make + " ";
                                 $("#search_string").text(searchString); 
 
-                                // build current search
+                                // Disable menu selection
+                                $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
+
+                                // Populate Menu with selection
+                                $("#dropdownMenu1").text("Make: " + car.make.name);      
+
+                                // build current search info display
                                 let currentSearch = $('#current_search').text();
                                 currentSearch = currentSearch + " " + searchString.replace('Search For:','');
                                 $('#current_search').text(currentSearch);
-
-                                // $('#model_dropdown > ul').html('');
                             
                                 for(const model of car.make.models){
                                     let prior2 = searchString;
+                                   
                                     let el2 = $(`<li><button class="dropdown-item" type="button" value="${model}">${model}</button></li>`)                                    
                                     .on("click", function(e){
-                                        searchString = prior2 + e.target.value;
-                                        prior3 = searchString;                                        
-                                        $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
-                                        $("#search_string").text(searchString);
 
-                                         // build current search
+                                        // Build search string sent to Google Programmable API
+                                        searchString = prior2 + e.target.value;
+                                        prior3 = searchString;   // For next build step
+                                        the_car_model = e.target.value;  
+                                        $("#search_string").text(searchString);    
+                                        
+                                        // Disable menu selection
+                                        $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');  
+
+                                        // Build search string sent to Google Programmable API
                                         let currentSearch = $('#current_search').text();
                                         currentSearch = currentSearch + " " + searchString.replace('Search For:','').replace(car.make.name,'');
                                         $('#current_search').text(currentSearch);
@@ -514,45 +569,44 @@
                                         for (const year of years.reverse()){
                                             let el = $(`<li><button class="dropdown-item" type="button" value="${year}">${year}</button></li>`)
                                                 .on("click", function(e){
+
+                                                    // Build search string sent to Google Programmable API
                                                     let val = e.target.value;
+                                                    the_car_year = val;
                                                     let str = val.toString() + " " +  prior3.replace("Search For: ","");
                                                     $("#search_string").text("Search For: " + str);
 
-                                                     // build current search
+                                                    // Build search string sent to Google Programmable API
                                                     let currentSearch = $('#current_search').text();
                                                     $('#current_search').text(currentSearch
                                                         .replace(car.make.name,'').replace(model,'') + val + " " + car.make.name + " " + model);
 
+                                                    // Populate menu with selection    
                                                     $("#dropdownMenu3").text("Year: " + year);
+
                                                     searchString = str;  
-                                                    base_string = searchString;                                                   
+                                                    base_string = searchString;      
+                                                
+                                                    // Disable Menus from selection
                                                     $("#dropdownMenu2").add('.dropdown-menu').removeClass('show');                                                    
                                                     $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                                 });
                                             $('#year_dropdown > ul').append(el);
                                         }
 
-                                        console.log(years);
+                                        // Setup tool tip for location submit button
                                         $('#location > input').tooltip();
-                                        $('#location > input').attr('data-toggle','tooltop').attr('title','Press Submit after Input').attr('data-placement','left');
+                                        $('#location > input').attr('data-toggle','tooltop').attr('title','Press Submit Location Button after Input').attr('data-placement','left');
                                         $('#location > input').attr("disabled",false).on("click",function(){
-                                            $(this).val('');                                        
-                                            
-                                        });
-
-                                       
-
-                                        
+                                            $(this).val('');        
+                                        });                                        
                                     });
                                                                 
-                                    $('#model_dropdown > ul').append(el2);
-                                
+                                    $('#model_dropdown > ul').append(el2);                                
                                 } 
-                                
-                                //$("#dropdownMenu2").add('.dropdown-menu').addClass('show');
+                               
                                 $("#custom_results").html('');
-                                $('#showCar').html('');
-                                     
+                                $('#showCar').html('');                                     
                                 
                             })
                             .on('mousedown',function(){
@@ -560,26 +614,50 @@
                             });  
                             $('#make_dropdown > ul').append(el);                  
                         }
-
                         
-                        $('#location > input').on("change",function(e){
-                           
+                        $('#location > input').on("change",function(e){                              
+                            // build current search                         
                             searchString = "Search For: " + searchString + " " + e.target.value;   
                             $("#search_string").text(searchString); 
                             let currentSearch = $('#current_search').text();
-                            $('#current_search').html(`<p>${currentSearch}<br>at Location of ${e.target.value}</p>`);
-                              
-    
-
-                        });
-                        
-
+                            $('#current_search').html(`<p>${currentSearch}<br>at Location of ${e.target.value}</p>`);  
+                        });    
                         
                     });               
                    
             };
-            const setInfoDisplay = function(){
 
+            const getCarMake = function(url){
+                let info = '';
+                if(url.includes('gurus')){
+                    info = "Car Gurus";        
+                }
+                else if(url.includes("carmax")){
+                    info = "CarMax";              
+                }
+                else if(url.includes("usnews")){
+                    info = "US News & World Reports";      
+                }
+                else if(url.includes("carvana")){
+                    info = "Carvana";              
+                }
+                else if(url.includes("truecar")){
+                    info = "TrueCar, Inc";
+                }
+                else if(url.includes("autotrader")){
+                    info = "Autotrader";
+                }
+                else{    
+                    info = "Internet";
+                }
+                
+                return info;
+
+            };
+
+            // Selects which CarSite Info Display occurs according to Global carsite_url
+            const setInfoDisplay = function(){
+                let info = '';
                 if(carsite_url.includes('gurus')){
                                 info = "CarGurus Site will be Searched";
                                 $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;" >
@@ -595,84 +673,84 @@
 
                                 //$('#iconDisplay').find('.carousel-item:not(".cargurus")').css('display','none');                
                             }
-                            else if(carsite_url.includes("carmax")){
-                                info = "CarMax Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
-                                                        <img src="images/carmax.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title" style="color:blue">CarMax site description</h5>
-                                                            <p class="card-text">CarMax, Inc. is a holding company, which engages in the retail of used vehicles and wholesale vehicle 
-                                                                auction operator. It operates through the CarMax Sales Operations and CarMax Auto Finance (CAF) segments. 
-                                                                The CarMax Sales Operations segment consists of all aspects of its auto merchandising and service operations.
-                                                            </p>     
-                                                        </div>
-                                                                                  
-                                                    </div>`);
-                                //$('#iconDisplay').find('.carousel-item:not(".carmax")').css('display','none');                    
-                            }
-                            else if(carsite_url.includes("usnews")){
-                                info = "US News & World Reports Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
-                                                        <img src="images/us news & world reports.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title" style="color:blue">US News & World Reports site description</h5>
-                                                            <p class="card-text">U.S. News & World Report (USNWR) is an American media company that publishes news, consumer advice, rankings, and analysis.
-                                                            It was launched in 1948 as the merger of domestic-focused weekly newspaper U.S. News and international-focused weekly magazine World Report.
-                                                            </p>      
-                                                        </div>
-                                                                                 
-                                                    </div>`);
-                                //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
-                            }
-                            else if(carsite_url.includes("carvana")){
-                                info = "Carvana Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
-                                                        <img src="images/carvana.png" class="card-img-top" alt="Carvana" style="transform:scale(0.6)">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title" style="color:blue">Carvana site description</h5>
-                                                            <p class="card-text">Carvana is an online-only used-car retailer that performs almost all the functions a physical dealer would offer: buying and 
-                                                                selling cars, accepting trade-ins, and financing purchases. Naturally, the company's site contains a thorough FAQ page, 
-                                                                but here's a primer on how it works.
-                                                            </p>      
-                                                        </div>
-                                                                                 
-                                                    </div>`);
-                                //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
-                            }
-                            else if(carsite_url.includes("truecar")){
-                                info = "TrueCar, Inc. Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
-                                                        <img src="images/truecar.png" class="card-img-top" alt="TrueCar, Inc." style="transform:scale(0.5)">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title" style="color:blue">TrueCar, Inc. site description</h5>
-                                                            <p class="card-text">What is TrueCar? TrueCar is an information and technology platform that enables its users to communicate with TrueCar 
-                                                               Certified Dealers for a great car buying experience. Our mission is simple: make the car buying process simple, fair and fun.
-                                                            </p>      
-                                                        </div>
-                                                                                 
-                                                    </div>`);
-                                //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
-                            }
-                            else if(carsite_url.includes("autotrader")){
-                                info = "Autotrader Site will be Searched";
-                                $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;">
-                                                        <img src="images/autotrader.png" class="card-img-top" alt="Autotrader" style="transform:scale(0.6)">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title" style="color:blue">Autotrader site description</h5>
-                                                            <p class="card-text">Autotrader.com, Inc. is an online marketplace for car buyers and sellers, founded in 1997. It aggregates new, used, 
-                                                            and certified second-hand cars from dealers and private sellers. The site also provides users with automotive reviews, shopping advice, 
-                                                            and comparison tools for car financing and insurance information.
-                                                            </p>      
-                                                        </div>
-                                                                                 
-                                                    </div>`);
-                                //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
-                            }
-                            else{    
-                                info = "Likely the General Internet being Searched";
-                            }
-                            
-                            $("#info").text(info).fadeIn();
+                else if(carsite_url.includes("carmax")){
+                    info = "CarMax Site will be Searched";
+                    $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
+                                            <img src="images/carmax.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
+                                            <div class="card-body">
+                                                <h5 class="card-title" style="color:blue">CarMax site description</h5>
+                                                <p class="card-text">CarMax, Inc. is a holding company, which engages in the retail of used vehicles and wholesale vehicle 
+                                                    auction operator. It operates through the CarMax Sales Operations and CarMax Auto Finance (CAF) segments. 
+                                                    The CarMax Sales Operations segment consists of all aspects of its auto merchandising and service operations.
+                                                </p>     
+                                            </div>
+                                                                        
+                                        </div>`);
+                    //$('#iconDisplay').find('.carousel-item:not(".carmax")').css('display','none');                    
+                }
+                else if(carsite_url.includes("usnews")){
+                    info = "US News & World Reports Site will be Searched";
+                    $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
+                                            <img src="images/us news & world reports.png" class="card-img-top" alt="Car Gurus" style="transform:scale(0.6)">
+                                            <div class="card-body">
+                                                <h5 class="card-title" style="color:blue">US News & World Reports site description</h5>
+                                                <p class="card-text">U.S. News & World Report (USNWR) is an American media company that publishes news, consumer advice, rankings, and analysis.
+                                                It was launched in 1948 as the merger of domestic-focused weekly newspaper U.S. News and international-focused weekly magazine World Report.
+                                                </p>      
+                                            </div>
+                                                                        
+                                        </div>`);
+                    //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
+                }
+                else if(carsite_url.includes("carvana")){
+                    info = "Carvana Site will be Searched";
+                    $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
+                                            <img src="images/carvana.png" class="card-img-top" alt="Carvana" style="transform:scale(0.6)">
+                                            <div class="card-body">
+                                                <h5 class="card-title" style="color:blue">Carvana site description</h5>
+                                                <p class="card-text">Carvana is an online-only used-car retailer that performs almost all the functions a physical dealer would offer: buying and 
+                                                    selling cars, accepting trade-ins, and financing purchases. Naturally, the company's site contains a thorough FAQ page, 
+                                                    but here's a primer on how it works.
+                                                </p>      
+                                            </div>
+                                                                        
+                                        </div>`);
+                    //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
+                }
+                else if(carsite_url.includes("truecar")){
+                    info = "TrueCar, Inc. Site will be Searched";
+                    $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:lightGrey;color:black;">
+                                            <img src="images/truecar.png" class="card-img-top" alt="TrueCar, Inc." style="transform:scale(0.5)">
+                                            <div class="card-body">
+                                                <h5 class="card-title" style="color:blue">TrueCar, Inc. site description</h5>
+                                                <p class="card-text">What is TrueCar? TrueCar is an information and technology platform that enables its users to communicate with TrueCar 
+                                                    Certified Dealers for a great car buying experience. Our mission is simple: make the car buying process simple, fair and fun.
+                                                </p>      
+                                            </div>
+                                                                        
+                                        </div>`);
+                    //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
+                }
+                else if(carsite_url.includes("autotrader")){
+                    info = "Autotrader Site will be Searched";
+                    $('#siteInfo').html(`<div class="card text-center rounded" style="background-color:white;color:black;">
+                                            <img src="images/autotrader.png" class="card-img-top" alt="Autotrader" style="transform:scale(0.6)">
+                                            <div class="card-body">
+                                                <h5 class="card-title" style="color:blue">Autotrader site description</h5>
+                                                <p class="card-text">Autotrader.com, Inc. is an online marketplace for car buyers and sellers, founded in 1997. It aggregates new, used, 
+                                                and certified second-hand cars from dealers and private sellers. The site also provides users with automotive reviews, shopping advice, 
+                                                and comparison tools for car financing and insurance information.
+                                                </p>      
+                                            </div>
+                                                                        
+                                        </div>`);
+                    //$('#iconDisplay').find('.carousel-item:not(".usnews")').css('display','none');                   
+                }
+                else{    
+                    info = "Likely the General Internet being Searched";
+                }
+                
+                $("#info").text(info).fadeIn();
 
             };
 
@@ -696,7 +774,11 @@
                 $('#search_string').text(search);
                 $('#iconDisplay').fadeOut();
                 $('#previous_searches').fadeOut();
+
+                // Selects which CarSite Info Display occurs according to Global carsite_url
                 setInfoDisplay();
+
+                // Performs Google Programmable Search
                 loadGoogleSearch(search);
             };
 
@@ -709,9 +791,10 @@
                 $(".do-search").on("mouseover mouseenter", function(){
                     
                     $(this).tooltip();
-                    $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search).attr('data-placement','left');
+                    $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search.replace("Search For")).attr('data-placement','left');
                     $(this).focus();
-                    $('#previous_searches').html(`<h1>Repeat Search For: ${search}</h1>`).fadeIn();
+                    $('#previous_searches').html(`<h1>Repeat Search For: ${search}</h1>`).fadeOut();
+                    $('#current_search').html(`<p>The Site: <i><b>${getCarMake(url)}</b></i> will be searched for <i><b>${search}</b></i></p>`).fadeIn();
 
                     $(this).on('mouseleave',function() {       
                         $('#previous_searches').html(previousSearches);             
@@ -724,22 +807,30 @@
             };
 
            
-
+            // Performs Google Programmable Search
             const loadGoogleSearch = function(search=null) {
                 if(search)
                     searchString = search;
+
                 doGoogleSearch(carsite_url);  
                 
                 $('#info').append('<p id="waiting">Please Wait....</p>');
-                 
+                
+                // Prepares Custom Results field where results accordian will be displayed
                 $('#custom_results').append('<p id="waiting" style="position:relative;width:100%;text-align:center;font-size:2.0em;color:blue;">Searches are Loading....</p>');
 
+                /* 3 second timeout for results to return
+                // Search criteria is programmatically inserted into google search element
+                // This element is also faded out
+                */
                 setTimeout(function(){
                     google.search.cse.element.getElement('search').clearAllResults();                       
                     $('#gsc-i-id1').attr('data-as_sitesearch',carsite_url);                        
                     google.search.cse.element.getElement('search').prefillQuery(searchString.replace("Search For:","")); 
                     google.search.cse.element.getElement('search').execute(searchString.replace("Search For:","")); 
                     $('#gsc-i-id1').fadeOut();   
+
+                    // Adjusting Info displays
                     $('#info').find('#waiting').remove();
                     let pattern = /was Searched.*/g;
                     let res =  $('#info').text().match(pattern);
@@ -750,6 +841,7 @@
                         text = $('#info').text().replace(res," was searched");
 
                     let addon = $("#search_string").text().replace("Search For:","for ").replace("Search For:","");
+
                     $('#info').html(`<p>${text} using Google Programmable Search<br>${addon}</p>`);
                     $('#location > input').attr("disabled",true)
                     $("#search_string").text("");
@@ -772,7 +864,9 @@
                 },3000);
             };
         
-           
+            /* Load Previous Car Searches and load in GUI
+            // Also setup hovering and loading a previous search
+            */
             const getPreviousSearches = (carimages) => {
                 console.log(carimages.length);
                 if(carimages.length > 0){
@@ -790,7 +884,8 @@
                             <button type="button" class="do-search" onclick="prepareSearch('${carsite}','${search}')" onmouseover="{hintSearch('${carsite}','${search}');}"  
                                     style="position:relative;left:30%;top:-30%;font-size:0.90em;display:none;z-index:30;"class="btn btn-primary">Load Search</button>
                             </div>`);
-                        
+
+                        // seven cars per row
                         if(count > 7){
                             console.log("appending");
                             $('#search_results').append('<div class="row text-center w-100 m-1"></div>');
@@ -806,6 +901,7 @@
 
                     }
 
+                    // Set hovering and selecting an old search
                     $('.img-fluid').parent().on('mouseover',function(){
                         $(this).find('.do-search').css('display','block');
                         $(this).siblings().css('opacity',0.60);
@@ -826,6 +922,7 @@
             
             };
 
+            // Clear search file by sending empty array
             const clearSearches = () => {
                 $('#search_results').html('');
                 var myText = JSON.stringify({"carimages":[]});
@@ -841,6 +938,7 @@
 
             };
 
+            // Fetch Data from file (json format) of Previous Car searches
             const loadCarData = () => {
                 $('#search_results').html('');
                 $('#current_search').fadeOut();
@@ -860,6 +958,8 @@
 
 
             $(document).ready(function(){
+
+                // Build Info/Instructions Carousel
                 const statements = [
                     {el: `<div class="container"><p class="hdinfo rounded">Get Car Info from Different Sites!</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Sites like: CarMax, Cargurus, US News and Reports, and others</p></div>`},
@@ -888,20 +988,17 @@
                     carousel_item.append(statement.el)
                     carousel_inner2.append(carousel_item)
                 }
-                $("#info_carousel").append(carousel_inner2);
-
-
-                
+                $("#info_carousel").append(carousel_inner2);                
                
-                // Fetch Data for and Do Logic for Previous Search Display
+                // Load Data from file of Previous Searched
                 loadCarData();
-           
-                    
              
                 searchString = '';   
+
+                // Loading all Dropdown Menus and their events
                 loadMenus();
 
-
+                // Previous Searches Reloaded
                 $('#dosearch').on("click",function(){                       
                         loadGSC();
                         $('#search_results').html('<div id="custom_results" class="col" ></div>');
@@ -916,6 +1013,10 @@
                             $('#year').val('');
                             $('#search_results').fadeIn();
                         }
+                        $("#dropdownMenu4").text('Choose Car Site');
+                        $("#dropdownMenu1").text('Car Make');
+                        $("#dropdownMenu2").text('Car Model');
+                        $("#dropdownMenu3").text('Car Year');
                       
                 });   
 
@@ -932,6 +1033,8 @@
                     });    
                 });
             */
+
+            // Warning to Make Selections before search
             $('#model_dropdown > ul').on("mouseover",function(){               
                   let test =  $(this).html().replace("\\n","").replace(/\s+/g, '').toString().length;
                   if(test === 0){
