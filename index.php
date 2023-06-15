@@ -19,8 +19,10 @@
         }
         #car_info {
             position:relative;
+            background-image:linear-gradient(white,lightgrey); 
+            height:25%;
             width: 90%;
-            margin-left:10%;
+            margin-left:152%;
             float:left;
         }
        
@@ -56,7 +58,7 @@
         #searchInfo{
             position:relative;
             width:90%;
-            margin-left:10%;
+            margin-left:12%;
             float:left;
             height:20%;
             padding:2em 0;
@@ -93,14 +95,7 @@
             font-weight: bold;
             line-height: 25px;
         }
-       
-        #car_info {
-            position:relative;   
-            position:relative;
-            background-image:linear-gradient(white,lightgrey); 
-            height:25%;
-            width:100%;
-        }
+    
 
         #results {
             display:none;
@@ -446,8 +441,9 @@
                         $('#carinfo_dropdown > ul > li')
                         .on("click",function(e){
                             let droptext = $(e.target).text();
+                            $('#dropdownMenu4').text("Site: " + droptext);
                             $('#site_selected').fadeIn().find('h4').text("Site Selected: " + droptext);
-                            $('#location > input').attr("disabled",true)
+                            $('#location > input').attr("disabled",true);
                             $('#iconDisplay').hide();                            
                             $("#info").text(''); 
                             $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
@@ -469,10 +465,11 @@
                                 searchString = 'Search For: ';
                                 searchString = prior1 + car.make.name + " ";
                                 $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
+                                $("#dropdownMenu1").text("Make: " + car.make.name);
                                 $("#search_string").text(searchString); 
                                 // $('#model_dropdown > ul').html('');
                             
-                                for(model of car.make.models){
+                                for(const model of car.make.models){
                                     let prior2 = searchString;
                                     let el2 = $(`<li><button class="dropdown-item" type="button" value="${model}">${model}</button></li>`)                                    
                                     .on("click", function(e){
@@ -480,12 +477,14 @@
                                         prior3 = searchString;                                        
                                         $("#dropdownMenu4").add('.dropdown-menu').removeClass('show');
                                         $("#search_string").text(searchString);
-                                        for (year of years.reverse()){
+                                        $("#dropdownMenu2").text("Model: " + model);
+                                        for (const year of years.reverse()){
                                             let el = $(`<li><button class="dropdown-item" type="button" value="${year}">${year}</button></li>`)
                                                 .on("click", function(e){
                                                     let val = e.target.value;
                                                     let str = val.toString() + " " +  prior3.replace("Search For: ","");
                                                     $("#search_string").text("Search For: " + str);
+                                                    $("#dropdownMenu3").text("Year: " + year);
                                                     searchString = str;  
                                                     base_string = searchString;                                                   
                                                     $("#dropdownMenu2").add('.dropdown-menu').removeClass('show');                                                    
@@ -495,8 +494,11 @@
                                         }
 
                                         console.log(years);
+                                        $('#location > input').tooltip();
+                                        $('#location > input').attr('data-toggle','tooltop').attr('title','Press Submit after Input').attr('data-placement','left');
                                         $('#location > input').attr("disabled",false).on("click",function(){
-                                            $(this).val('');
+                                            $(this).val('');                                        
+                                            
                                         });
 
                                        
@@ -700,13 +702,13 @@
 
                     let addon = $("#search_string").text().replace("Search For:","for ").replace("Search For:","");
                     $('#info').html(`<p>${text} using Google Programmable Search<br>${addon}</p>`);
-
+                    $('#location > input').attr("disabled",true)
                     $("#search_string").text("");
                     //alert(JSON.stringify(imgArr));
                     $('#showCar').css('display','block');
                     $('#siteInfo').css('display','none');
 
-/*
+                /*
                     var myText = JSON.stringify(imgArr);
                     console.log('Textarea: '+myText);
                     var url ="save.php";
@@ -798,7 +800,7 @@
             };
 
             const locationInput = (val) => {              
-                $('#done').on("click",function(){
+                $('#submit').on("click",function(){
                     $("#search_string").text("Search For: " + base_string + " " + val);
                     $('#location > input').val('Input Location').attr('placeholder','Input Location');
                 });
@@ -810,7 +812,7 @@
                     {el: `<div class="container"><p class="hdinfo rounded">Get Car Info from Different Sites!</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Sites like: CarMax, Cargurus, US News and Reports, and others</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Use Dropdowns to Select Car and Year</p></div>`},
-                    {el: `<div class="container"><p class="hdinfo rounded">Type In Location (State and/or City and/or Zip Code) and Press Done</p></div>`}, 
+                    {el: `<div class="container"><p class="hdinfo rounded">Type In Location (State and/or City and/or Zip Code) and Press Submit</p></div>`}, 
                     {el: `<div class="container"><p class="hdinfo rounded">Year and Location are Optional</p></div>`},
                     {el: `<div class="container"><p class="hdinfo rounded">Display Fields Show Search Site and Criteria</p></div>`},
                     {el:`<div class="container"><p class="hdinfo rounded">Press 'Do Search' button and Wait a Just a Moment</p></div>`},
@@ -982,7 +984,7 @@
                         </div>
                         <input type="text" class="form-control" value="" placeholder="Input Location" onkeyup="locationInput(this.value)" aria-label="Car Location" aria-describedby="btnGroupAddon" disabled>
                     </div>
-                    <button id="done" type="button" class="btn btn-secondary">Done</button>
+                    <button id="submit" type="button" class="btn btn-secondary">Submit</button>
                 </div>
                 <div>
                     <h2 id="search_string" class="mb-2 mt-2"></h2>
