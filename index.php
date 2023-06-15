@@ -786,22 +786,23 @@
                 search = search.replace("Search","").replace("For","").replace(":","");
                 $('#search_string').text(search).css('color','red').fadeIn();
                 $('#info').text("Repeat Search For: " + search).css('color','red').fadeIn();
-                let previousSearches = $('#previous_searches').html();
-
+                
+               /*
                 $(".do-search").on("mouseover mouseenter", function(){
                     
                     $(this).tooltip();
                     $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search.replace("Search For")).attr('data-placement','left');
                     $(this).focus();
-                    $('#previous_searches').html(`<h1>Repeat Search For: ${search}</h1>`).fadeOut();
+                    $('#previous_searches').css('display','none');
                     $('#current_search').html(`<p>The Site: <i><b>${getCarMake(url)}</b></i> will be searched for <i><b>${search}</b></i></p>`).fadeIn();
 
                     $(this).on('mouseleave',function() {       
-                        $('#previous_searches').html(previousSearches);             
+                        $('#current_search').html(`<h3>Images Represent Previous Searches<br>Hover and Click to Repeat Search</h3>`);  
                         $('#search_string').text('').css('transform','scale(1)').fadeIn();
                         $('#info').text("Select Site and Car For a Lot Of Info").css('transform','scale(1)').css('z-index','1').css('padding','3px').fadeIn();
                     });
                 });
+                */
 
             
             };
@@ -884,6 +885,22 @@
                             <button type="button" class="do-search" onclick="prepareSearch('${carsite}','${search}')" onmouseover="{hintSearch('${carsite}','${search}');}"  
                                     style="position:relative;left:30%;top:-30%;font-size:0.90em;display:none;z-index:30;"class="btn btn-primary">Load Search</button>
                             </div>`);
+
+                        el.on("mouseover mouseenter", function(){
+                    
+                            $(this).tooltip();
+                            $(this).attr('data-toggle','tooltop').attr('title',"Repeat Search For: " + search.replace("Search For","")).attr('data-placement','left');
+                            $(this).focus();
+                            $('#previous_searches').css('display','none');
+                            $('#current_search').html(`<p>The Site: <i><b>${getCarMake(carsite)}</b></i> will be searched for <i><b>${search.replace("Search For","")}</b></i></p>`).fadeIn();
+
+                            $(this).on('mouseleave',function() {       
+                                $('#current_search').html(`<h3>Images Represent Previous Searches<br>Hover and Click to Repeat Search</h3>`);  
+                                $('#search_string').text('').css('transform','scale(1)').fadeIn();
+                                $('#info').text("Select Site and Car For a Lot Of Info").css('transform','scale(1)').css('z-index','1').css('padding','3px').fadeIn();
+                            });
+                        });
+    
 
                         // seven cars per row
                         if(count > 7){
