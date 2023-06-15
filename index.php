@@ -319,6 +319,7 @@
                     $('#showCar').append(carousel_inner);
                     $('#iconDisplay').hide();
                     resultsDiv.appendChild(table);
+                    customResults.find('#waiting').hide();
                     customResults.append(results_accordian);
                     storeImageLinks(imgArr2);
                     //customResults.appendChild(table);     
@@ -352,9 +353,9 @@
                     .then((response) => response.json())
                     .then((json) => {
                         let imgArr2 = json;
-                        console.log(json);
+                        //console.log(json);
                         let no_carimages = imgArr2.carimages.length;
-                        console.log(no_carimages + ":" + imgArr.carimages.length);
+                        //console.log(no_carimages + ":" + imgArr.carimages.length);
                         if(no_carimages > 200)
                             imgArr2 = {"carimages":[]};
    
@@ -363,7 +364,7 @@
                                 let test = imgArr.carimages.filter(function(img){
                                     return img.link == image.link;
                                 });
-                                console.log(test);
+                                //console.log(test);
                                 if( test.length == 0)
                                     imgArr.carimages.push(image);
                             }
@@ -372,13 +373,13 @@
                             imgArr2 = {"carimages":[]};
                             imgArr.carimages.push(image);
                         }
-                        console.log("new length:",imgArr.carimages.length);
+                        //console.log("new length:",imgArr.carimages.length);
                         var myText = JSON.stringify(imgArr);
-                        console.log('Textarea: '+myText);
+                        //console.log('Textarea: '+myText);
                         var url ="save.php";
                         $.post(url, {"myText": myText}, function(data){
 
-                        console.log('response from the callback function: '+ data); 
+                        //console.log('response from the callback function: '+ data); 
                         }).fail(function(jqXHR){
                             alert(jqXHR.status +' '+jqXHR.statusText+ ' $.post failed!');
                         });    
@@ -684,6 +685,8 @@
                 doGoogleSearch(carsite_url);  
                 
                 $('#info').append('<p id="waiting">Please Wait....</p>');
+                 
+                $('#custom_results').append('<p id="waiting" style="position:relative;width:100%;text-align:center;font-size:2.0em;color:blue;">Searches are Loading....</p>');
 
                 setTimeout(function(){
                     google.search.cse.element.getElement('search').clearAllResults();                       
@@ -850,7 +853,7 @@
                 loadMenus();
 
 
-                $('#dosearch').on("click",function(){
+                $('#dosearch').on("click",function(){                       
                         loadGSC();
                         $('#search_results').html('<div id="custom_results" class="col" ></div>');
                         $('#search_results').attr('top','-40%');                       
